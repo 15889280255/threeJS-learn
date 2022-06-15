@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import VButton from "./VButton.vue";
 
-defineProps({
+const props = defineProps({
   show: {
     type: Boolean,
     default: false,
@@ -42,8 +42,14 @@ defineProps({
   },
 });
 
-function onCancel() {}
-function onSubmit() {}
+const emit = defineEmits(["update:show"]);
+
+function onCancel() {
+  emit("update:show", !props.show);
+}
+function onSubmit() {
+  emit("update:show", !props.show);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -59,7 +65,9 @@ $border: 1px solid rgb(188, 188, 188);
   display: flex;
   flex-direction: column;
   header {
-    padding: 3px 10px;
+    letter-spacing: 5px;
+    color: rgb(211, 211, 211);
+    padding: 5px 10px;
     display: flex;
     justify-content: space-between;
     font-weight: bold;

@@ -11,6 +11,7 @@ function goToPage(e: MouseEvent) {
   if (liDom) {
     const path = (liDom as HTMLLIElement).getAttribute("path");
     path && router.push(path);
+    if (showMenu.value) showMenu.value = !showMenu.value;
   }
 }
 
@@ -25,7 +26,7 @@ function toggleShowMenu() {
   <div class="drawer" v-show="showMenu">
     <ul @click="goToPage">
       <li v-for="(route, index) in routeList" :path="route.path">
-        <span v-if="index > 0">{{ index }}.</span>{{ route.name }}
+        <span v-if="index >= 1">{{ index }}.</span>{{ route.name }}
       </li>
     </ul>
   </div>

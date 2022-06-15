@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import { Mesh, Object3D, PerspectiveCamera, WebGLRenderer } from "three";
 import useResetWindow from "../hooks/useResetWindow";
 import addTextLabel from "../utils/addTextLabel";
@@ -11,10 +11,15 @@ import useStats from "../hooks/useStats";
 import { makeTextSprite } from "../utils/addSpriteLabelText";
 import VDialog from "../components/VDialog.vue";
 import VButton from "../components/VButton.vue";
+import VLoading from '../components/VLoading.vue'
 
 const canvasDom = ref<HTMLCanvasElement>();
 const renderRef = ref<WebGLRenderer>();
 const cameraRef = ref<PerspectiveCamera>();
+
+const temp = ref(10);
+const temp2 = ref(10);
+const showLoading = ref(true)
 
 const { handleResize } = useResetWindow(renderRef, cameraRef);
 
@@ -62,8 +67,7 @@ function init() {
   loader.load(
     "./model/first.glb",
     (gltf) => {
-      const object = gltf.scene;
-      console.log("object: ", object);
+      const object = gltf.scene; 
       object.traverse(function (item) {
         if (item instanceof Mesh) {
           item.material.transparent = true;
@@ -73,15 +77,16 @@ function init() {
       scene.add(object);
     },
     (xhr) => {
-      console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      const percentage = (xhr.loaded / xhr.total) * 100
+      if (percentage >= 99){
+         showLoading.value = false
+         nextTick(()=>handleResize())
+      }
     },
     (error) => {
       console.log(error);
     }
   );
-
-  const temp = ref(10);
-  const temp2 = ref(10);
 
   addTextLabel(
     scene,
@@ -167,33 +172,85 @@ function init() {
 }
 
 // 详细数据弹框
-const showDialog = ref(true);
+const showDialog = ref(false);
 </script>
 
 <template>
-  <canvas id="canvas" style="display: none"></canvas>
-  <canvas id="canvasDom" ref="canvasDom"></canvas>
-  <div class="actionButton">
-    <VButton id="seeInfoBtn" @click="() => (showDialog = !showDialog)">
-      查看详细数据
-    </VButton>
-    <VButton id="controlBtn">控制参数</VButton>
-  </div>
-  <VDialog
-    :show="showDialog"
-    :width="'300px'"
-    :top="'100px'"
-    :background-color="'rgb(21,149,260,0.85)'"
-  >
-    <div>
-      设备1：
-      <VButton @click="() => (showDialog = !showDialog)"> 开机 </VButton>
+  <VLoading :show-loading="showLoading" />
+  <div v-show="!showLoading">
+    <canvas id="canvas" style="display: none"></canvas>
+    <canvas id="canvasDom" ref="canvasDom"></canvas>
+    <div class="actionButton">
+      <VButton id="seeInfoBtn" @click="() => (showDialog = !showDialog)">
+        查看详细数据
+      </VButton>
     </div>
-    <div>室内温度： 20°C</div>
-    <div>室内温度： 20°C</div>
-    <div>室内温度： 20°C</div>
-    <div>室内温度： 20°C</div>
-  </VDialog>
+    <VDialog v-model:show="showDialog" :width="'350px'" :top="'100px'" :title="'设备实时数据'"
+      :background-color="'rgba(92,158,240,0.9)'">
+      <div class="dialogContent">
+        <table cellpadding="4">
+          <thead>
+            <th>
+            <td colspan="3">设备1：</td>
+            </th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>室内温度：</td>
+              <td>{{ temp }}</td>
+              <td>°C</td>
+            </tr>
+            <tr>
+              <td>电源输入端电压有效:</td>
+              <td>{{ temp2 }}</td>
+              <td>°C</td>
+            </tr>
+            <tr>
+              <td>PFC散热片或PFC模块温度：</td>
+              <td>{{ temp }}</td>
+              <td>°C</td>
+            </tr>
+            <tr>
+              <td>IPM散热片或IPM模块温度：</td>
+              <td>{{ temp2 }}</td>
+              <td>°C</td>
+            </tr>
+          </tbody>
+        </table>
+        <table cellpadding="4">
+          <thead>
+            <th>
+            <td colspan="3">设备2：</td>
+            </th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>室内温度：</td>
+              <td>{{ temp }}</td>
+              <td>°C</td>
+            </tr>
+            <tr>
+              <td>电源输入端电压有效:</td>
+              <td>{{ temp2 }}</td>
+              <td>°C</td>
+            </tr>
+            <tr>
+              <td>PFC散热片或PFC模块温度：</td>
+              <td>{{ temp }}</td>
+              <td>°C</td>
+            </tr>
+            <tr>
+              <td>IPM散热片或IPM模块温度：</td>
+              <td>{{ temp2 }}</td>
+              <td>°C</td>
+            </tr>
+          </tbody>
+        </table>
+        <VButton @click="() => (showDialog = !showDialog)"> 开机 </VButton>
+        <VButton @click="() => (showDialog = !showDialog)"> 关机 </VButton>
+      </div>
+    </VDialog>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -202,10 +259,17 @@ const showDialog = ref(true);
   width: inherit;
   height: inherit;
 }
+
 .actionButton {
   position: fixed;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
+}
+
+.dialogContent {
+  .keyValueUnit {
+    display: flex;
+  }
 }
 </style>
