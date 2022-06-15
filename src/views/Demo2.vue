@@ -95,7 +95,7 @@ function init() {
     });
 
     const loader = new FBXLoader();
-    const url = "../../public/model/test.fbx";
+    const url = "./model/test.fbx";
     loader.load(url, function (loadedModel) {
       console.log(loadedModel);
       loadedModel.translateY(-80);

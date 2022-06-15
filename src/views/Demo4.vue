@@ -60,7 +60,7 @@ function init() {
   // 加载模型
   const loader = new GLTFLoader();
   loader.load(
-    "../../public/model/first.glb",
+    "./model/first.glb",
     (gltf) => {
       const object = gltf.scene;
       console.log("object: ", object);
