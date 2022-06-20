@@ -14,12 +14,10 @@ const useResetWindow = (
       cameraRef.updateProjectionMatrix();
       rendererRef.setSize(canvas.clientWidth, canvas.clientHeight, false);
     }
-    console.log("handleResize: ");
+    console.log("handleResize: 111111111111");
   }
 
-  onMounted(() => {
-    window.addEventListener("resize", handleResize);
-  });
+  window.addEventListener("resize", handleResize);
 
   onUnmounted(() => {
     window.removeEventListener("resize", handleResize);

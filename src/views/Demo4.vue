@@ -86,7 +86,7 @@ async function LoadModel(scene:Scene) {
       (xhr) => {
         const percentage = (xhr.loaded / xhr.total) * 100
         if (percentage >= 100){
-          showLoading.value = false 
+          // showLoading.value = false 
           nextTick(()=>resolve(null))
         }
       },
@@ -146,6 +146,7 @@ async function init() {
   const { handleResize } = useResetWindow(renderer, camera);
   initLight(scene)
   await LoadModel(scene)
+  showLoading.value = false 
 
   setInterval(() => {
     initSprite(scene);
@@ -164,7 +165,9 @@ async function init() {
   }
 
   animate();
-  handleResize();
+  setTimeout(() => {
+    handleResize();
+  }, 0);
 }
 
 
