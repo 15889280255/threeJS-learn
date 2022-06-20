@@ -146,7 +146,6 @@ async function init() {
   const { handleResize } = useResetWindow(renderer, camera);
   initLight(scene)
   await LoadModel(scene)
-  showLoading.value = false 
 
   setInterval(() => {
     initSprite(scene);
@@ -162,11 +161,12 @@ async function init() {
   }
   function render() {
     renderer.render(scene, camera);
+    if(showLoading.value) showLoading.value = false 
   }
 
   animate();
   setTimeout(() => {
-    handleResize();
+    handleResize(); 
   }, 0);
 }
 
@@ -181,7 +181,7 @@ const showDialog = ref(false);
 
 <template>
   <VLoading :show-loading="showLoading" />
-  <div v-show="!showLoading">
+  <div class="demo4" v-show="!showLoading">
     <canvas id="canvas" style="display: none"></canvas>
     <canvas id="canvasDom" ref="canvasDom"></canvas>
     <div class="actionButton">
@@ -258,6 +258,10 @@ const showDialog = ref(false);
 </template>
 
 <style lang="scss" scoped>
+.demo4{
+  width: inherit;
+  height: inherit;
+}
 #canvasDom {
   display: block;
   width: inherit;
