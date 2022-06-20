@@ -23,8 +23,18 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/demo4",
-    name: "测试",
+    name: "3d模型",
     component: () => import("../views/Demo4.vue"),
+  },
+  {
+    path: "/demo5",
+    name: "正方体文字贴面",
+    component: () => import("../views/Demo5.vue"),
+  },
+  {
+    path: "/demo6",
+    name: "加载blender文件",
+    component: () => import("../views/Demo6.vue"),
   },
 ];
 

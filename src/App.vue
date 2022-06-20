@@ -5,12 +5,14 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 const routeList = router.getRoutes();
+routeList.splice(0,1)
 
 function goToPage(e: MouseEvent) {
   const liDom = e.target;
   if (liDom) {
     const path = (liDom as HTMLLIElement).getAttribute("path");
     path && router.push(path);
+    console.log("path: ", path);
     if (showMenu.value) showMenu.value = !showMenu.value;
   }
 }
@@ -26,7 +28,7 @@ function toggleShowMenu() {
   <div class="drawer" v-show="showMenu">
     <ul @click="goToPage">
       <li v-for="(route, index) in routeList" :path="route.path">
-        <span v-if="index >= 1">{{ index }}.</span>{{ route.name }}
+        <span>{{ index + 1 }}.</span>{{ route.name }}
       </li>
     </ul>
   </div>
@@ -62,6 +64,7 @@ body,
   width: 10vw;
   background-color: rgb(0, 0, 0);
   ul {
+    margin-top: 50px;
     list-style: none;
     li {
       margin-top: 10px;

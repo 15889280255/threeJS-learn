@@ -37,11 +37,11 @@ function getPositionByIndex(index: number) {
 }
 
 // 根据窗口大小变化，重新修改渲染器的视椎
-const { handleResize } = useResetWindow(rendererRef, cameraRef);
+// const { handleResize } = useResetWindow(rendererRef, cameraRef);
 
 onMounted(() => {
   init();
-  handleResize();
+  // handleResize();
 });
 
 async function init() {

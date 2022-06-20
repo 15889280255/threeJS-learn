@@ -17,8 +17,9 @@ const canvasDom = ref<HTMLCanvasElement>();
 const { stats } = useStats();//帧率
 
 const temp = ref(10);
-const temp2 = ref(10);
+const temp2 = ref(10); 
 const showLoading = ref(true)
+let cube:Mesh
 
 // 初始化渲染器
 function initRenderer(){
@@ -41,7 +42,7 @@ function initCamera(){
     0.1,
     1000
   );
-  camera.position.set(0, -0.5, 0.7);
+  camera.position.set(10, 5.5, 5.8);
   return camera
 }
 
@@ -49,7 +50,7 @@ function initCamera(){
 function initScene() {
   const scene = new THREE.Scene();
   // 添加坐标轴 xyz
-  // scene.add(new AxesHelper(5));
+  scene.add(new AxesHelper(5));
   return scene
 }
 
@@ -57,11 +58,7 @@ function initScene() {
 function initLight(scene:Scene) {
   const light = new PointLight();
   light.position.set(0.8, 1.4, 1.0);
-  scene.add(light);
-
-  const light1 = new PointLight();
-  light.position.set(0.8, 1.4, -1.0);
-  scene.add(light1);
+  scene.add(light); 
 
   const ambientLight = new AmbientLight();// 环境光
   scene.add(ambientLight); 
@@ -72,22 +69,25 @@ async function LoadModel(scene:Scene) {
   return new Promise((resolve,reject)=>{
     const loader = new GLTFLoader();
     loader.load(
-      "./model/first.glb",
+      "./model/乐高04.glb",
       (gltf) => {
-        const object = gltf.scene; 
-        object.traverse(function (item) {
-          if (item instanceof Mesh) {
-            item.material.transparent = true;
-            item.material.opacity = 0.9;
+        const object = gltf.scene;  
+        object.traverse(function (item) {  
+          if (item instanceof Mesh) { 
+            console.log('item: ', item);
+            item.material.opacity = 1;
+            if(item.name === '平面'){
+              cube = item
+            }
           }
         });
         scene.add(object);
+        nextTick(()=>resolve(null))
       },
       (xhr) => {
         const percentage = (xhr.loaded / xhr.total) * 100
-        if (percentage >= 100){
+        if (percentage >= 100){ 
           showLoading.value = false 
-          nextTick(()=>resolve(null))
         }
       },
       (error) => {
@@ -113,13 +113,28 @@ function clearSprite(scene: Scene,type = "Sprite") {
 function initSprite(scene: Scene,) {
     temp.value += 1;
     temp2.value += 2;
-    clearSprite(scene); 
-    const sprite1 = makeTextSprite(scene, `设备1 ${temp2.value}°C`);
-    sprite1?.position.set(-0.6, 0.125, 0.1);
-    const sprite2 = makeTextSprite(scene, `设备2 ${temp2.value}°C`);
-    sprite2?.position.set(-0.6, -0.15, 0.1);
-    const sprite3 = makeTextSprite(scene, `设备3 ${temp2.value}°C`);
-    sprite3?.position.set(-0.6, -0.45, 0.1); 
+    clearSprite(scene);
+    addTextLabel(
+      scene,
+      100,
+      50,
+      `设备1 ${temp.value}°C`,
+      15,
+      35,
+      [-0.6, 0.2, 0.1]
+    );
+    addTextLabel(
+      scene,
+      100,
+      50,
+      `设备2 ${temp2.value}°C`,
+      15,
+      35,
+      [-0.6, -0.4, 0.1]
+    );
+    makeTextSprite(scene, `设备2 ${temp2.value}°C`,30,20);
+    // makeTextSprite(scene, `设备2 ${temp2.value}°C`,200,50);
+    // makeTextSprite(scene, `设备2 ${temp2.value}°C`,300,50);
 }
 
 // 初始化控制器
@@ -130,8 +145,8 @@ function initControls(camera:PerspectiveCamera,renderer:WebGLRenderer) {
   controls.enableDamping = true; // 使动画循环使用时阻尼或自转 意思是否有惯性
   controls.enableZoom = true; //是否可以缩放
   controls.autoRotate = false; //是否自动旋转
-  controls.minDistance = 0.5 //设置相机距离原点的最远距离
-  controls.maxDistance = 3 //设置相机距离原点的最远距离
+  // controls.minDistance = 0.5 //设置相机距离原点的最远距离
+  // controls.maxDistance = 10 //设置相机距离原点的最远距离
   controls.enablePan = true   //是否开启右键拖拽
   controls.target.set(0, -0.1, 0);// 设置角度
   return controls
@@ -141,19 +156,18 @@ function initControls(camera:PerspectiveCamera,renderer:WebGLRenderer) {
 async function init() {
   const camera = initCamera()
   const renderer = initRenderer()
-  const scene = initScene()
+  const scene = initScene() 
   const controls = initControls(camera,renderer)
   const { handleResize } = useResetWindow(renderer, camera);
   initLight(scene)
-  await LoadModel(scene)
-
-  setInterval(() => {
-    initSprite(scene);
-  }, 1000);
-
-
-  function animate() {
+  await LoadModel(scene) 
+ 
+  let timer = 0
+  function animate() { 
     requestAnimationFrame(animate);
+    timer+=  0.01
+    cube.rotateX(0.01 )
+    cube.position.y = timer
 
     controls.update();
     stats.update();
